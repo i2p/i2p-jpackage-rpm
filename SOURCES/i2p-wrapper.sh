@@ -57,6 +57,12 @@ if [ ! -d "${I2P_CONFIG}/eepsite" ] && [ -d "${I2P_BASE}/eepsite" ]; then
     cp -a "${I2P_BASE}/eepsite" "${I2P_CONFIG}/eepsite"
 fi
 
+# Ensure cgi-context stays disabled (requires fcgiwrap + extra JARs not in base install)
+if [ -f "${I2P_CONFIG}/eepsite/contexts/cgi-context.xml" ]; then
+    mv "${I2P_CONFIG}/eepsite/contexts/cgi-context.xml" \
+       "${I2P_CONFIG}/eepsite/contexts/cgi-context.xml.disabled"
+fi
+
 # I2P system properties
 I2P_PROPS=(
     "-Di2p.dir.base=${I2P_BASE}"

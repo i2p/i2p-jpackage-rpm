@@ -85,6 +85,12 @@ done
 # Copy eepsite template directory (hidden service webserver config)
 cp -a pkg-temp/eepsite/ %{buildroot}%{i2p_home}/ 2>/dev/null || true
 
+# Ensure CGI context is disabled (requires fcgiwrap + extra JARs not in base)
+if [ -f %{buildroot}%{i2p_home}/eepsite/contexts/cgi-context.xml ]; then
+    mv %{buildroot}%{i2p_home}/eepsite/contexts/cgi-context.xml \
+       %{buildroot}%{i2p_home}/eepsite/contexts/cgi-context.xml.disabled
+fi
+
 # Apply headless-friendly overrides to upstream router.config
 # Disable auto-update (package manager handles updates)
 echo "" >> %{buildroot}%{i2p_home}/router.config
