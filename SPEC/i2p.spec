@@ -21,8 +21,6 @@ Source3:        i2p.tmpfiles
 Source4:        i2p.conf
 Source5:        i2p-wrapper.sh
 Source6:        i2p.logrotate
-Source7:        router.config
-Source8:        clients.config
 
 BuildRequires:  java-devel >= 1:17
 BuildRequires:  ant
@@ -79,18 +77,16 @@ cp -a pkg-temp/certificates/ %{buildroot}%{i2p_home}/ 2>/dev/null || true
 cp -a pkg-temp/geoip/ %{buildroot}%{i2p_home}/ 2>/dev/null || true
 cp -a pkg-temp/docs/ %{buildroot}%{i2p_home}/ 2>/dev/null || true
 
-# Blocklist and other data files
-cp -a pkg-temp/blocklist.txt %{buildroot}%{i2p_home}/ 2>/dev/null || true
-cp -a pkg-temp/hosts.txt %{buildroot}%{i2p_home}/ 2>/dev/null || true
-
-# Config files from upstream build (i2ptunnel, systray, etc.)
-for cfg in i2ptunnel.config systray.config; do
-    cp -a pkg-temp/${cfg} %{buildroot}%{i2p_home}/ 2>/dev/null || true
+# Copy ALL data and config files from upstream build
+for f in pkg-temp/*.txt pkg-temp/*.config; do
+    [ -f "$f" ] && cp -a "$f" %{buildroot}%{i2p_home}/ || true
 done
 
-# Default config files (our custom headless-friendly versions)
-install -m 644 %{SOURCE7} %{buildroot}%{i2p_home}/router.config
-install -m 644 %{SOURCE8} %{buildroot}%{i2p_home}/clients.config
+# Apply headless-friendly overrides to upstream router.config
+# Disable auto-update (package manager handles updates)
+echo "" >> %{buildroot}%{i2p_home}/router.config
+echo "# RPM package overrides" >> %{buildroot}%{i2p_home}/router.config
+echo "router.updateDisabled=true" >> %{buildroot}%{i2p_home}/router.config
 
 # Wrapper script
 install -d -m 755 %{buildroot}%{i2p_libexec}

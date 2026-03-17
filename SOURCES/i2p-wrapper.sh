@@ -44,9 +44,10 @@ if [ -z "$CLASSPATH" ]; then
 fi
 
 # Copy default configs on first run
-for cfg in router.config clients.config i2ptunnel.config; do
-    if [ ! -f "${I2P_CONFIG}/${cfg}" ] && [ -f "${I2P_BASE}/${cfg}" ]; then
-        cp "${I2P_BASE}/${cfg}" "${I2P_CONFIG}/${cfg}"
+for cfg in "${I2P_BASE}"/*.config; do
+    cfg_name=$(basename "$cfg")
+    if [ ! -f "${I2P_CONFIG}/${cfg_name}" ]; then
+        cp "$cfg" "${I2P_CONFIG}/${cfg_name}"
     fi
 done
 
