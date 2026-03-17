@@ -83,7 +83,12 @@ cp -a pkg-temp/docs/ %{buildroot}%{i2p_home}/ 2>/dev/null || true
 cp -a pkg-temp/blocklist.txt %{buildroot}%{i2p_home}/ 2>/dev/null || true
 cp -a pkg-temp/hosts.txt %{buildroot}%{i2p_home}/ 2>/dev/null || true
 
-# Default config files (reference copies in base dir)
+# Config files from upstream build (i2ptunnel, systray, etc.)
+for cfg in i2ptunnel.config systray.config; do
+    cp -a pkg-temp/${cfg} %{buildroot}%{i2p_home}/ 2>/dev/null || true
+done
+
+# Default config files (our custom headless-friendly versions)
 install -m 644 %{SOURCE7} %{buildroot}%{i2p_home}/router.config
 install -m 644 %{SOURCE8} %{buildroot}%{i2p_home}/clients.config
 
