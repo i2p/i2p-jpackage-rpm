@@ -64,6 +64,7 @@ I2P_PROPS=(
     "-Di2p.dir.log=${I2P_LOG}"
     "-Di2p.dir.pid=${I2P_PID}"
     "-Djava.library.path=/usr/lib64/i2p:/usr/lib/i2p"
+    "--enable-native-access=ALL-UNNAMED"
 )
 
 # Launch the I2P router
