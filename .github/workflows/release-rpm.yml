@@ -18,7 +18,7 @@ jobs:
         run: |
           dnf install -y \
             rpm-build rpmdevtools \
-            java-17-openjdk-devel ant gettext \
+            java-latest-openjdk-devel ant gettext \
             systemd-rpm-macros \
             curl bzip2 git
 
