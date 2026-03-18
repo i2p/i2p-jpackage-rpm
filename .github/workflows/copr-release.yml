@@ -54,18 +54,25 @@ jobs:
 
           # Check what COPR already has built
           echo "Checking COPR for existing builds..."
-          COPR_VERSION=$(curl -sf \
-            "https://copr.fedorainfracloud.org/api_3/package?ownername=i2porg&projectname=i2p&packagename=i2p&with_latest_succeeded_build=true" \
+          COPR_API="https://copr.fedorainfracloud.org/api_3/package?ownername=i2porg&projectname=i2p&packagename=i2p&with_latest_succeeded_build=true"
+          COPR_RAW=$(curl -s "$COPR_API")
+          echo "COPR API response: ${COPR_RAW}"
+
+          COPR_VERSION=$(echo "$COPR_RAW" \
             | jq -r '.latest_succeeded_build.source_package.version // empty' \
             | sed 's/-.*//')
 
           echo "COPR latest build version: ${COPR_VERSION:-none}"
 
-          if [ "$VERSION" = "$COPR_VERSION" ]; then
+          if [ -z "$COPR_VERSION" ]; then
+            echo "WARNING: Could not determine COPR build version. Building to be safe."
+            echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+            echo "should_build=true" >> "$GITHUB_OUTPUT"
+          elif [ "$VERSION" = "$COPR_VERSION" ]; then
             echo "Version ${VERSION} already built in COPR. Skipping."
             echo "should_build=false" >> "$GITHUB_OUTPUT"
           else
-            echo "New version detected: ${VERSION} (COPR has: ${COPR_VERSION:-none})"
+            echo "New version detected: ${VERSION} (COPR has: ${COPR_VERSION})"
             echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
             echo "should_build=true" >> "$GITHUB_OUTPUT"
           fi
