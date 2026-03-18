@@ -37,6 +37,7 @@ AutoReqProv:    no
 # Bundled libraries that cannot be unbundled (tightly coupled upstream build)
 Provides:       bundled(jetty) = 12.0.28
 Provides:       bundled(apache-tomcat) = 9.0.107
+Provides:       bundled(java-service-wrapper) = 3.5.56
 Provides:       bundled(jstl) = 1.2
 Provides:       bundled(slf4j) = 2.0.17
 
@@ -59,8 +60,9 @@ accessible at 127.0.0.1:7657 after starting the service.
 %setup -q -n i2p-%{version}
 
 # Remove pre-built JARs not needed for headless Linux build
-# Installer tools (izpack, launch4j, service wrapper) — only used for GUI installer
-rm -rf installer/lib/
+# Installer tools (izpack, launch4j) — only used for GUI installer
+rm -rf installer/lib/izpack/
+rm -rf installer/lib/launch4j/
 # Gradle wrapper — we build with ant
 rm -f gradle/wrapper/gradle-wrapper.jar
 
