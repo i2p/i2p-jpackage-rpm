@@ -44,7 +44,7 @@ run_in() {
 }
 
 echo "--- Installing Java runtime and RPM ---"
-run_in "zypper --non-interactive install /rpms/${RPM_NAME}"
+run_in "zypper --non-interactive --no-gpg-checks install /rpms/${RPM_NAME}"
 
 echo ""
 echo "--- Test 1: i2p user exists ---"
