@@ -8,7 +8,6 @@ RUN zypper --non-interactive refresh && \
         ant \
         gettext-runtime \
         systemd-rpm-macros \
-        sysuser-tools \
         curl \
         bzip2 && \
     zypper clean --all

@@ -30,7 +30,6 @@ BuildRequires:  systemd-rpm-macros
 %if 0%{?suse_version}
 BuildRequires:  java-17-openjdk-devel
 BuildRequires:  gettext-tools
-BuildRequires:  sysuser-tools
 %else
 BuildRequires:  java-devel >= 1:17
 BuildRequires:  gettext
@@ -160,7 +159,8 @@ install -d -m 750 %{buildroot}%{i2p_logdir}
 %pre
 %if 0%{?suse_version}
 %service_add_pre i2p.service
-%sysusers_create_package i2p %{SOURCE2}
+getent group i2p >/dev/null || groupadd -r i2p
+getent passwd i2p >/dev/null || useradd -r -g i2p -d /var/lib/i2p -s /sbin/nologin -c "I2P Anonymous Network" i2p
 %else
 %sysusers_create_compat %{SOURCE2}
 %endif
