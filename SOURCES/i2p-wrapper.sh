@@ -63,6 +63,10 @@ if [ -f "${I2P_CONFIG}/eepsite/contexts/cgi-context.xml" ]; then
        "${I2P_CONFIG}/eepsite/contexts/cgi-context.xml.disabled"
 fi
 
+# Create temp directory for Jetty JSP compilation
+I2P_TEMP="${I2P_CONFIG}/tmp"
+mkdir -p "${I2P_TEMP}"
+
 # I2P system properties
 I2P_PROPS=(
     "-Di2p.dir.base=${I2P_BASE}"
@@ -70,6 +74,7 @@ I2P_PROPS=(
     "-Di2p.dir.router=${I2P_CONFIG}"
     "-Di2p.dir.log=${I2P_LOG}"
     "-Di2p.dir.pid=${I2P_PID}"
+    "-Djava.io.tmpdir=${I2P_TEMP}"
     "-Djava.library.path=/usr/lib64/i2p:/usr/lib/i2p"
     "--enable-native-access=ALL-UNNAMED"
 )
