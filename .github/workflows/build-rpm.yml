@@ -8,18 +8,34 @@ on:
 
 jobs:
   build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - distro: fedora
+            container: fedora:41
+            install_cmd: >-
+              dnf install -y
+              rpm-build rpmdevtools
+              java-latest-openjdk-devel ant gettext
+              systemd-rpm-macros
+              curl bzip2 git
+          - distro: opensuse
+            container: opensuse/tumbleweed
+            install_cmd: >-
+              zypper --non-interactive install
+              rpm-build rpmdevtools
+              java-17-openjdk-devel ant gettext-runtime
+              systemd-rpm-macros sysuser-tools
+              curl bzip2 git
+
     runs-on: ubuntu-latest
     container:
-      image: fedora:41
+      image: ${{ matrix.container }}
 
     steps:
       - name: Install build tools
-        run: |
-          dnf install -y \
-            rpm-build rpmdevtools \
-            java-latest-openjdk-devel ant gettext \
-            systemd-rpm-macros \
-            curl bzip2 git
+        run: ${{ matrix.install_cmd }}
 
       - name: Checkout
         uses: actions/checkout@v4
@@ -32,10 +48,21 @@ jobs:
       - name: Upload RPM artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: i2p-rpms
+          name: i2p-rpms-${{ matrix.distro }}
           path: output/*.rpm
 
   test:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - distro: fedora
+            test_script: test-install.sh
+            artifact: i2p-rpms-fedora
+          - distro: opensuse
+            test_script: test-install-suse.sh
+            artifact: i2p-rpms-opensuse
+
     runs-on: ubuntu-latest
     needs: build
 
@@ -46,10 +73,10 @@ jobs:
       - name: Download RPM artifacts
         uses: actions/download-artifact@v4
         with:
-          name: i2p-rpms
+          name: ${{ matrix.artifact }}
           path: output/
 
       - name: Run install tests
         run: |
           chmod +x scripts/*.sh
-          ./scripts/test-install.sh
+          ./scripts/${{ matrix.test_script }}

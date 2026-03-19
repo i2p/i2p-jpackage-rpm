@@ -1,0 +1,24 @@
+FROM opensuse/tumbleweed
+
+RUN zypper --non-interactive refresh && \
+    zypper --non-interactive install \
+        rpm-build \
+        rpmdevtools \
+        java-17-openjdk-devel \
+        ant \
+        gettext-runtime \
+        systemd-rpm-macros \
+        sysuser-tools \
+        curl \
+        bzip2 && \
+    zypper clean --all
+
+RUN rpmdev-setuptree
+
+COPY SPEC/ /build/SPEC/
+COPY SOURCES/ /build/SOURCES/
+COPY scripts/ /build/scripts/
+
+RUN chmod +x /build/scripts/*.sh
+
+WORKDIR /build

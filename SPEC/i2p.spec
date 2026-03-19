@@ -9,8 +9,11 @@
 
 Name:           i2p
 Version:        2.11.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Anonymous network providing privacy-preserving communication
+%if 0%{?suse_version}
+Group:          Productivity/Networking/Other
+%endif
 
 License:        Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND MIT AND GPL-2.0-only AND GPL-2.0-or-later AND GPL-3.0-only AND LGPL-2.1-only AND EPL-1.0 AND CC-BY-3.0 AND Artistic-2.0
 URL:            https://i2p.net/
@@ -24,12 +27,21 @@ Source6:        i2p.logrotate
 
 BuildRequires:  java-devel >= 1:17
 BuildRequires:  ant
-BuildRequires:  gettext
 BuildRequires:  systemd-rpm-macros
+%if 0%{?suse_version}
+BuildRequires:  gettext-tools
+BuildRequires:  sysuser-tools
+%else
+BuildRequires:  gettext
+%endif
 
 Requires:       java-headless >= 1:17
 Requires:       logrotate
+%if 0%{?suse_version}
+Requires(pre):  shadow
+%else
 Requires(pre):  shadow-utils
+%endif
 
 # Disable automatic dependency generation — I2P bundles its own JARs
 AutoReqProv:    no
@@ -141,16 +153,33 @@ install -d -m 750 %{buildroot}%{i2p_confdir}
 install -d -m 750 %{buildroot}%{i2p_logdir}
 
 %pre
+%if 0%{?suse_version}
+%service_add_pre i2p.service
+%sysusers_create_package i2p %{SOURCE2}
+%else
 %sysusers_create_compat %{SOURCE2}
+%endif
 
 %post
+%if 0%{?suse_version}
+%service_add_post i2p.service
+%else
 %systemd_post i2p.service
+%endif
 
 %preun
+%if 0%{?suse_version}
+%service_del_preun i2p.service
+%else
 %systemd_preun i2p.service
+%endif
 
 %postun
+%if 0%{?suse_version}
+%service_del_postun_with_restart i2p.service
+%else
 %systemd_postun_with_restart i2p.service
+%endif
 
 %files
 # Static application data
@@ -175,6 +204,11 @@ install -d -m 750 %{buildroot}%{i2p_logdir}
 %license LICENSE*
 
 %changelog
+* Wed Mar 18 2026 StormyCloud <admin@i2p.net> - 2.11.0-4
+- Add openSUSE/SLES conditional macros for multi-distro support
+- Add Group tag, sysuser-tools BuildRequires for openSUSE
+- Use distro-specific systemd and sysusers scriptlet macros
+
 * Wed Mar 18 2026 StormyCloud <admin@i2p.net> - 2.11.0-3
 - Remove pre-built JARs not needed for build (installer, gradle wrapper)
 - Add Provides: bundled() for Jetty, Tomcat, JSTL, SLF4J

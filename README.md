@@ -2,38 +2,68 @@
 
 RPM packaging for [I2P](https://i2p.net/), the Invisible Internet Project anonymous network router.
 
-Produces installable `.rpm` packages for Fedora and RHEL/CentOS/Rocky/Alma Linux.
+Produces installable `.rpm` packages for Fedora, RHEL/CentOS/Rocky/Alma Linux, and openSUSE.
 
 > **Note:** Despite the "jpackage" name, this repository does not use Java's `jpackage` tool.
 > The name follows the I2P project's convention of prefixing deployment packaging repos with
 > `i2p-jpackage-` (e.g., `i2p-jpackage-deb`, `i2p-jpackage-rpm`) to keep them organized
 > under a common namespace.
 
-## Quick Start
+## Supported Distributions
 
-### Using the build container (recommended)
+| Distribution | Build System | Status |
+|---|---|---|
+| Fedora 41+ | [COPR](https://copr.fedorainfracloud.org/coprs/i2porg/i2p/) | Active |
+| RHEL/CentOS/Rocky/Alma 9+ | COPR (with EPEL) | Active |
+| openSUSE Tumbleweed | [OBS](https://build.opensuse.org/) | In progress |
+| openSUSE Leap 15.6 | OBS | In progress |
+
+## Install from COPR (Fedora/RHEL)
 
 ```bash
-podman build -t i2p-rpm-builder -f docker/Dockerfile.build .
-podman run --rm -v ./output:/output i2p-rpm-builder /build/scripts/build-rpm.sh 2.11.0
+sudo dnf copr enable i2porg/i2p
+sudo dnf install i2p
 ```
 
-### Building locally on Fedora
+## Install from OBS (openSUSE)
+
+See [obs/README.md](obs/README.md) for OBS setup and build instructions.
+
+## Quick Start (Build Locally)
+
+### Fedora
 
 ```bash
-# Install build dependencies
-sudo dnf install rpm-build rpmdevtools java-latest-openjdk-devel ant gettext systemd-rpm-macros
+# Using the build container (recommended)
+podman build -t i2p-rpm-builder -f docker/Dockerfile.build .
+podman run --rm -v ./output:/output i2p-rpm-builder /build/scripts/build-rpm.sh 2.11.0
 
-# Build
+# Or build locally
+sudo dnf install rpm-build rpmdevtools java-latest-openjdk-devel ant gettext systemd-rpm-macros
+./scripts/build-rpm.sh 2.11.0
+```
+
+### openSUSE
+
+```bash
+# Using the build container
+./scripts/build-obs.sh 2.11.0
+
+# Or build locally
+sudo zypper install rpm-build rpmdevtools java-17-openjdk-devel ant gettext-runtime systemd-rpm-macros sysuser-tools
 ./scripts/build-rpm.sh 2.11.0
 ```
 
 The built RPMs will be in `./output/`.
 
-## Installing
+## Installing (from local build)
 
 ```bash
-sudo dnf install ./output/i2p-2.11.0-1.fc41.noarch.rpm
+# Fedora
+sudo dnf install ./output/i2p-*.noarch.rpm
+
+# openSUSE
+sudo zypper install ./output/i2p-*.noarch.rpm
 ```
 
 ## Post-Install
@@ -61,18 +91,24 @@ sudo systemctl status i2p
 ## Project Structure
 
 ```
-SPEC/i2p.spec            # RPM spec file
+SPEC/i2p.spec            # RPM spec file (multi-distro with conditionals)
 SOURCES/                  # Systemd units, configs, wrapper script
 scripts/                  # Build and test scripts
-docker/                   # Build container Dockerfile
+docker/                   # Build container Dockerfiles (Fedora + openSUSE)
+obs/                      # openSUSE Build Service files
 .github/workflows/       # CI pipelines
 .copr/                   # COPR build integration
 ```
 
-## Target Distributions
+## Testing
 
-- Fedora 41+
-- RHEL/CentOS/Rocky/Alma 9+ (with EPEL)
+```bash
+# Test on Fedora
+./scripts/test-install.sh
+
+# Test on openSUSE
+./scripts/test-install-suse.sh
+```
 
 ## License
 

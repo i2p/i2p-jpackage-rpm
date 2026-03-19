@@ -1,0 +1,9 @@
+-------------------------------------------------------------------
+Wed Mar 18 12:00:00 UTC 2026 - StormyCloud <admin@i2p.net>
+
+- Initial openSUSE package for I2P 2.11.0
+- Anonymous network router with HTTP/SOCKS proxy, router console,
+  I2PSnark BitTorrent client, SusiMail email client
+- Systemd service integration
+- FHS-compliant file layout
+
